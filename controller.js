@@ -3,6 +3,13 @@ const dataSchema = require('./models/data');
 
 const Data = mongoose.model('Data', dataSchema)
 const makeRandomStr = () => Math.random().toString(36).substring(2);
+const mapper = (keyArr, obj) => {
+	let result = {}
+	for (const key of keyArr) {
+		result[key] = obj[key]
+	}
+	return result;
+};
 
 const getData = async (req, res) => {
 	const data = await Data.find({ key: req.params.key });
@@ -15,10 +22,10 @@ const getData = async (req, res) => {
 			createAt: Date.now(),
 		});
 		await newData.save();
-		res.send(newData.data);
+		res.send(mapper(['key', 'data'], newData));
 	} else {
 		console.log(`cache hit!`);
-		res.send(data[0].data);
+		res.send(mapper(['key', 'data'], data[0]))
 	}
 };
 
