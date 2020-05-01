@@ -41,7 +41,20 @@ const getAllData = async (req, res) => {
 	res.send(output)
 };
 
+const updateData = async (req, res) => {
+	await Data.findOneAndUpdate(
+		{ key: req.params.key }, 
+		req.body,
+		{new: true},
+		(err, doc) => {
+			if (err) console.log(err);
+			res.send(doc)
+		}
+	)
+};
+
 module.exports = {
 	getData,
-	getAllData
+	getAllData,
+	updateData
 }
