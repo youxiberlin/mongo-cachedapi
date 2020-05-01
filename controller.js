@@ -53,8 +53,19 @@ const updateData = async (req, res) => {
 	)
 };
 
+const deleteData = async (req, res) => {
+	await Data.findOneAndDelete(
+		{ key: req.params.key },
+		(err, doc) => {
+			if (err) console.log(err);
+			res.send(doc)
+		}
+	)
+};
+
 module.exports = {
 	getData,
 	getAllData,
-	updateData
+	updateData,
+	deleteData
 }
