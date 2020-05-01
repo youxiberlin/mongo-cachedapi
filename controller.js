@@ -29,6 +29,19 @@ const getData = async (req, res) => {
 	}
 };
 
+const getAllData = async (req, res) => {
+	let result;
+	await Data.find({}, (err, res) => {
+		if (err) console.log(err);
+		result = res.map(data => mapper(['key', 'data'], data))
+	});
+	const output = {
+		data: result
+	}
+	res.send(output)
+};
+
 module.exports = {
-	getData
+	getData,
+	getAllData
 }
