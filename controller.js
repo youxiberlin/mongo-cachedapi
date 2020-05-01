@@ -1,13 +1,13 @@
 const mongoose = require('mongoose');
 const dataSchema = require('./models/data');
 
-const Data = mongoose.model('Data', dataSchema)
+const Data = mongoose.model('Data', dataSchema);
 const makeRandomStr = () => Math.random().toString(36).substring(2);
 const mapper = (keyArr, obj) => {
 	let result = {}
 	for (const key of keyArr) {
 		result[key] = obj[key]
-	}
+	};
 	return result;
 };
 
@@ -25,7 +25,7 @@ const getData = async (req, res) => {
 		res.send(mapper(['key', 'data'], newData));
 	} else {
 		console.log(`cache hit!`);
-		res.send(mapper(['key', 'data'], data[0]))
+		res.send(mapper(['key', 'data'], data[0]));
 	}
 };
 
@@ -37,20 +37,19 @@ const getAllData = async (req, res) => {
 	});
 	const output = {
 		data: result
-	}
-	res.send(output)
+	};
+	res.send(output);
 };
 
 const updateData = async (req, res) => {
 	await Data.findOneAndUpdate(
-		{ key: req.params.key }, 
+		{ key: req.params.key },
 		req.body,
 		{new: true},
 		(err, doc) => {
-			if (err) console.log(err);
+			if (err) console.log(`err: ${err}`);
 			res.send(doc)
-		}
-	)
+		});
 };
 
 const deleteData = async (req, res) => {
@@ -60,12 +59,23 @@ const deleteData = async (req, res) => {
 			if (err) console.log(err);
 			res.send(doc)
 		}
-	)
+	);
+};
+
+const deleteAllData = async (req, res) => {
+	await Data.deleteMany({}, (err,doc) => {
+		if (err) console.log(err);
+		res.send({
+			success: true,
+			deletedCount: doc.deletedCount
+		})
+	});
 };
 
 module.exports = {
 	getData,
 	getAllData,
 	updateData,
-	deleteData
-}
+	deleteData,
+	deleteAllData
+};
