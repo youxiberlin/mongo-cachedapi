@@ -1,15 +1,9 @@
 const mongoose = require('mongoose');
 const dataSchema = require('./models/data');
+const mapper = require('./services/mapper');
 
 const Data = mongoose.model('Data', dataSchema);
 const makeRandomStr = () => Math.random().toString(36).substring(2);
-const mapper = (keyArr, obj) => {
-	let result = {}
-	for (const key of keyArr) {
-		result[key] = obj[key]
-	};
-	return result;
-};
 
 const getData = async (req, res) => {
 	// あとで置き換える
