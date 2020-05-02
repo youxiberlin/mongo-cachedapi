@@ -10,7 +10,8 @@ const { port, dbRoute } = require('./config');
 mongoose.connect(dbRoute, {
 	useNewUrlParser: true,
 	useUnifiedTopology: true,
-	useFindAndModify: false
+	useFindAndModify: false,
+	useCreateIndex: true,
 }).then(() => console.log('connected to mongoDB'),
 	err => console.log(`mongoDB connection error: ${err}`))
 
