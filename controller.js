@@ -1,9 +1,9 @@
 const mongoose = require('mongoose');
 const dataSchema = require('./models/data');
 const mapper = require('./services/mapper');
+const makeRandomStr = require('./services/randomStr');
 
 const Data = mongoose.model('Data', dataSchema);
-const makeRandomStr = () => Math.random().toString(36).substring(2);
 
 const getData = async (req, res) => {
 	// あとで置き換える
