@@ -12,17 +12,42 @@ const mapper = (keyArr, obj) => {
 };
 
 const getData = async (req, res) => {
+	// あとで置き換える
+	const cacheLimitExceeds = false;
+
 	const data = await Data.find({ key: req.params.key });
+
 	if (!data.length) {
 		console.log('cache miss');
 		const randomStr = makeRandomStr();
-		let newData = new Data({
+		const newData = new Data({
 			key: req.params.key,
 			data: randomStr,
 			createAt: Date.now(),
 		});
-		await newData.save();
-		res.send(mapper(['key', 'data'], newData));
+
+		if (cacheLimitExceeds) {
+				await Data.findOne({}, {}, { sort: { 'createAt': 1} }, async (err, doc) => {
+					if (err) console.log(err);
+					await Data.findOneAndUpdate(
+						{ key: doc.key },
+						{
+							key: req.params.key,
+							data: randomStr,
+							createAt: Date.now()
+						},
+						{new: true},
+						(err, doc) => {
+							if (err) console.log(`err: ${err}`);
+							const result = mapper(['data', 'key'], doc);
+							res.send(result);
+						}
+					);
+				});
+			} else {
+				await newData.save();
+				res.send(mapper(['key', 'data'], newData));
+			}
 	} else {
 		console.log(`cache hit!`);
 		res.send(mapper(['key', 'data'], data[0]));
@@ -49,7 +74,8 @@ const updateData = async (req, res) => {
 		(err, doc) => {
 			if (err) console.log(`err: ${err}`);
 			res.send(doc)
-		});
+		}
+	);
 };
 
 const deleteData = async (req, res) => {
