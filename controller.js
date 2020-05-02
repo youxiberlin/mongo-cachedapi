@@ -9,11 +9,7 @@ const checkCacheLimit = (dataCount, cacheLimit) => dataCount >= cacheLimit;
 
 const getData = async (req, res) => {
 	const data = await Data.find({ key: req.params.key });
-	let dataCount;
-	await Data.countDocuments({}, (err, num) => {
-		if (err) console.log(err);
-		dataCount = num;
-	});
+	const dataCount = await Data.countDocuments({});
 	const cacheLimitExceeds = checkCacheLimit(dataCount, dbCacheLimit);
 	
 	if (!data.length) {
@@ -26,28 +22,28 @@ const getData = async (req, res) => {
 		});
 		
 		if (cacheLimitExceeds) {
-				console.log('cacheLimit exceeds');
-				await Data.findOne({}, {}, { sort: { 'createAt': 1} }, async (err, doc) => {
-					if (err) console.log(err);
-					await Data.findOneAndUpdate(
-						{ key: doc.key },
-						{
-							key: req.params.key,
-							data: randomStr,
-							createAt: Date.now()
-						},
-						{new: true},
-						(err, doc) => {
-							if (err) console.log(`err: ${err}`);
-							const result = mapper(['data', 'key'], doc);
-							res.send(result);
-						}
-					);
-				});
-			} else {
-				await newData.save();
-				res.send(mapper(['key', 'data'], newData));
-			}
+			console.log('cacheLimit exceeds');
+			await Data.findOne({}, {}, { sort: { 'createAt': 1} }, async (err, doc) => {
+				if (err) console.log(err);
+				await Data.findOneAndUpdate(
+					{ key: doc.key },
+					{
+						key: req.params.key,
+						data: randomStr,
+						createAt: Date.now()
+					},
+					{new: true},
+					(err, doc) => {
+						if (err) console.log(`err: ${err}`);
+						const result = mapper(['data', 'key'], doc);
+						res.send(result);
+					}
+				);
+			});
+		}
+		
+		await newData.save();
+		res.send(mapper(['key', 'data'], newData));
 	} else {
 		console.log(`cache hit!`);
 		res.send(mapper(['key', 'data'], data[0]));
@@ -55,15 +51,10 @@ const getData = async (req, res) => {
 };
 
 const getAllData = async (req, res) => {
-	let result;
-	await Data.find({}, (err, res) => {
+	await Data.find({}, (err, docs) => {
 		if (err) console.log(err);
-		result = res.map(data => mapper(['key', 'data'], data))
+		res.send({ data: docs });
 	});
-	const output = {
-		data: result
-	};
-	res.send(output);
 };
 
 const updateData = async (req, res) => {
@@ -72,7 +63,7 @@ const updateData = async (req, res) => {
 		req.body,
 		{new: true},
 		(err, doc) => {
-			if (err) console.log(`err: ${err}`);
+			if (err) console.log(err);
 			res.send(doc)
 		}
 	);
