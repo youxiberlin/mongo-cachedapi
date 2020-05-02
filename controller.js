@@ -2,15 +2,20 @@ const mongoose = require('mongoose');
 const dataSchema = require('./models/data');
 const mapper = require('./services/mapper');
 const makeRandomStr = require('./services/randomStr');
+const { dbCacheLimit } = require('./config');
 
 const Data = mongoose.model('Data', dataSchema);
+const checkCacheLimit = (dataCount, cacheLimit) => dataCount >= cacheLimit;
 
 const getData = async (req, res) => {
-	// あとで置き換える
-	const cacheLimitExceeds = false;
-
 	const data = await Data.find({ key: req.params.key });
-
+	let dataCount;
+	await Data.countDocuments({}, (err, num) => {
+		if (err) console.log(err);
+		dataCount = num;
+	});
+	const cacheLimitExceeds = checkCacheLimit(dataCount, dbCacheLimit);
+	
 	if (!data.length) {
 		console.log('cache miss');
 		const randomStr = makeRandomStr();
@@ -19,8 +24,9 @@ const getData = async (req, res) => {
 			data: randomStr,
 			createAt: Date.now(),
 		});
-
+		
 		if (cacheLimitExceeds) {
+				console.log('cacheLimit exceeds');
 				await Data.findOne({}, {}, { sort: { 'createAt': 1} }, async (err, doc) => {
 					if (err) console.log(err);
 					await Data.findOneAndUpdate(
