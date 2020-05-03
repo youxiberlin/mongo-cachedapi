@@ -5,9 +5,9 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 
 const routes = require('./routes');
-const { port, dbRoute } = require('./config');
+const { port, mongoRoute } = require('./config');
 
-mongoose.connect(dbRoute, {
+mongoose.connect(mongoRoute, {
 	useNewUrlParser: true,
 	useUnifiedTopology: true,
 	useFindAndModify: false,
