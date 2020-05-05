@@ -53,7 +53,8 @@ const getData = async (req, res) => {
 const getAllData = async (req, res) => {
 	await Data.find({}, (err, docs) => {
 		if (err) console.log(err);
-		res.send({ data: docs });
+		const result = docs.map(doc => mapper(['data', 'key'], doc))
+		res.send({ data: result });
 	});
 };
 
