@@ -11,7 +11,7 @@ describe('Data', () => {
 	describe('create data', () => {
 		it('create a new data if there is no key in the db', (done) => {
 			chai.request('http://localhost:3000')
-				.get('/data/1')
+				.get('/data/4')
 				.end((err, res) => {
 					expect(res).to.have.status(200);
 					expect(res.body).to.have.all.keys('data', 'key');

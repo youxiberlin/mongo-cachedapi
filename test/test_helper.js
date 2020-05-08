@@ -1,20 +1,9 @@
 const mongoose = require('mongoose');
+const dataSchema = require('../models/data');
+const sampleData = require('./data/sampleData');
 
-mongoose.Promise = global.Promise;
-mongoose.connect('mongodb://localhost:27017/cacheapi_test');
-mongoose.connection
-	.once('open', () => console.log('Connected!'))
-	.on('error', (error) => {
-		console.warn('Error : ',error);
-	});
-
-// beforeEach((done) => {
-// 	mongoose.connection.collections.cacheapi_test.drop(() => {
-// 			//this function runs after the drop is completed
-// 		done(); //go ahead everything is done now.
-// 	});
-// // });
-// beforeEach((done) => {
-// 	console.log('executing before each');
-// 	done();
-// });
+const Data =mongoose.connection.model('Data', dataSchema);
+Data.insertMany(sampleData, (err, docs) => {
+	if (err) console.log(err);
+	console.log(`docs: ${docs}`);
+});
