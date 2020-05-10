@@ -2,12 +2,12 @@ const dotenv = require('dotenv');
 dotenv.config();
 const express = require('express');
 const bodyParser = require('body-parser');
-const mongoDBConnect = require('./services/mongodb');
+const { initializeMongoDB } = require('./services/mongodb');
 
 const routes = require('./routes');
 const { port, mongoRoute } = require('./config');
 
-mongoDBConnect(mongoRoute);
+initializeMongoDB(mongoRoute)
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
