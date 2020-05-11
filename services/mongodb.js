@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const logger = require('./logger');
 
 const connect = (mongoRoute) => mongoose.connect(mongoRoute, {
 		useNewUrlParser: true,
@@ -8,9 +9,9 @@ const connect = (mongoRoute) => mongoose.connect(mongoRoute, {
 	});
 
 const initializeMongoDB = (mongoRoute) => {
-	mongoose.connection.on('connected', () => console.log(`connected to ${mongoRoute}`));
-	mongoose.connection.on('error', () => console.log(`mongoDB connection error`));
-	mongoose.connection.on('disconnected', () => console.log(`mongoDB is disconnected`));
+	mongoose.connection.on('connected', () => logger.info(`connected to ${mongoRoute}`));
+	mongoose.connection.on('error', () => logger.error(`mongoDB connection error`));
+	mongoose.connection.on('disconnected', () => logger.warn(`mongoDB is disconnected`));
 	return connect(mongoRoute);
 };
 
