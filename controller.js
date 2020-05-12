@@ -4,6 +4,14 @@ const mapper = require('./services/mapper');
 const makeRandomStr = require('./services/randomStr');
 const { dbCacheLimit } = require('./config');
 const logger = require('./services/logger');
+const validate = require('./services/validator');
+
+const definitions = {
+	data: {
+		data: 'string',
+		key: 'number',
+	}
+};
 
 const Data = mongoose.model('Data', dataSchema);
 const checkCacheLimit = (dataCount, cacheLimit) => dataCount >= cacheLimit;
@@ -39,12 +47,15 @@ const getData = async (req, res) => {
 						const result = mapper(['data', 'key'], doc);
 						res.send(result);
 					}
-				);
-			});
-		}
-		
+					);
+				});
+			}
+			
 		await newData.save();
-		res.send(mapper(['key', 'data'], newData));
+		const result = mapper(['key', 'data'], newData);
+		const isValid = validate(result, definitions.data);
+		if (!isValid) logger.warn('validation error');
+		res.send(result);
 	} else {
 		logger.info(`cache hit!`);
 		res.send(mapper(['key', 'data'], data[0]));
