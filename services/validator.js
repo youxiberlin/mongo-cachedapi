@@ -15,8 +15,9 @@ const validate = (obj, def, errs = []) => {
 	});
 	
 	if (errs.length) {
-		errs.forEach(err => logger.error(err))
+		errs.forEach(err => logger.warn(err))
 	}
+
 	return errs.length ? false : true;
 };
 

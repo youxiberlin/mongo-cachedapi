@@ -14,8 +14,9 @@ const getData = async (req, res) => {
 	const data = await Data.find({ key: req.params.key });
 	const dataCount = await Data.countDocuments({});
 	const cacheLimitExceeds = checkCacheLimit(dataCount, dbCacheLimit);
+	const dataIsNew = data.length ? false : true;
 	
-	if (!data.length) {
+	if (dataIsNew) {
 		logger.info('cache miss');
 		const randomStr = makeRandomStr();
 		const newData = new Data({
@@ -39,22 +40,19 @@ const getData = async (req, res) => {
 					(err, doc) => {
 						if (err) logger.error(`err: ${err}`);
 						const result = mapper(['data', 'key'], doc);
-						const isValid = validate(result, definitions.data);
-						if (!isValid) logger.warn('validation error');
 						res.send(result);
 					}
-					);
-				});
-			}
+				);
+			});
+		}
 			
 		await newData.save();
 		const result = mapper(['key', 'data'], newData);
-		const isValid = validate(result, definitions.data);
-		if (!isValid) logger.warn('validation error');
 		res.send(result);
 	} else {
 		logger.info(`cache hit!`);
-		res.send(mapper(['key', 'data'], data[0]));
+		const result = mapper(['key', 'data'], data[0]);
+		res.send(result);
 	}
 };
 
