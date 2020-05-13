@@ -5,13 +5,7 @@ const makeRandomStr = require('./services/randomStr');
 const { dbCacheLimit } = require('./config');
 const logger = require('./services/logger');
 const validate = require('./services/validator');
-
-const definitions = {
-	data: {
-		data: 'string',
-		key: 'number',
-	}
-};
+const definitions = require('./services/definitions');
 
 const Data = mongoose.model('Data', dataSchema);
 const checkCacheLimit = (dataCount, cacheLimit) => dataCount >= cacheLimit;
