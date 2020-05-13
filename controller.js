@@ -39,6 +39,8 @@ const getData = async (req, res) => {
 					(err, doc) => {
 						if (err) logger.error(`err: ${err}`);
 						const result = mapper(['data', 'key'], doc);
+						const isValid = validate(result, definitions.data);
+						if (!isValid) logger.warn('validation error');
 						res.send(result);
 					}
 					);
