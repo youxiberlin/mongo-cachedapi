@@ -40,6 +40,7 @@ const getData = async (req, res) => {
 					(err, doc) => {
 						if (err) logger.error(`err: ${err}`);
 						const result = mapper(['data', 'key'], doc);
+						validate(result, definitions.data);
 						res.send(result);
 					}
 				);
@@ -48,10 +49,12 @@ const getData = async (req, res) => {
 			
 		await newData.save();
 		const result = mapper(['key', 'data'], newData);
+		validate(result, definitions.data);
 		res.send(result);
 	} else {
 		logger.info(`cache hit!`);
 		const result = mapper(['key', 'data'], data[0]);
+		validate(result, definitions.data);
 		res.send(result);
 	}
 };
@@ -59,7 +62,8 @@ const getData = async (req, res) => {
 const getAllData = async (req, res) => {
 	await Data.find({}, (err, docs) => {
 		if (err) logger.error(err);
-		const result = docs.map(doc => mapper(['data', 'key'], doc))
+		const result = docs.map(doc => mapper(['data', 'key'], doc));
+		validate(result, definitions.allData);
 		res.send({ data: result });
 	});
 };
