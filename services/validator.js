@@ -1,4 +1,5 @@
 const logger = require('./logger');
+const util = require('util');
 
 const validate = (obj, def, errs = []) => {
 	const keys = Object.keys(obj);
@@ -10,7 +11,7 @@ const validate = (obj, def, errs = []) => {
 			if (!isArray(def[key])) errs.push(`invalid type of data: ${key} is not Array`);
 			else return validate(obj[key][0], def[key][0], errs);
 		} else {
-			if (!validateObj(key)) errs.push(`invalid type of data: ${obj[key]} is not ${def[key]} `);
+			if (!validateObj(key)) errs.push(`invalid type of data: ${util.inspect(obj[key])} is not ${def[key]} `);
 		}
 	});
 	
