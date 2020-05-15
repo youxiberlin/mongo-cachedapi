@@ -6,20 +6,22 @@ const validate = (obj, def, errs = []) => {
 	const isArray = obj => Array.isArray(obj);
 	const validateObj = key => typeof obj[key] === def[key];
 
-	keys.forEach((key) => {
-		if (isArray(obj[key])) {
-			if (!isArray(def[key])) errs.push(`invalid type of data: ${key} is not Array`);
-			else return validate(obj[key][0], def[key][0], errs);
-		} else {
+	if (isArray(def)) {
+		if (!isArray(obj)) errs.push(`invalid type of data: ${key} is not Array`);
+		obj.forEach(o => {
+			return validate(o, def[0], errs);
+		});
+	} else {
+		keys.forEach((key) => {
 			if (!validateObj(key)) errs.push(`invalid type of data: ${util.inspect(obj[key])} is not ${def[key]} `);
-		}
-	});
-	
-	if (errs.length) {
-		errs.forEach(err => logger.warn(err))
+		});
 	}
-
-	return errs.length ? false : true;
+	return errs
 };
 
-module.exports = validate;
+const logErrs = (obj, def) => {
+	const errs = validate(obj, def)
+	errs.forEach(err => logger.warn(err));
+}
+
+module.exports = logErrs;
